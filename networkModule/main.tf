@@ -7,7 +7,7 @@ terraform {
       version = "~> 4.0"
     }
   }
-}
+}}
 
 # Configure AWS provider for us-east-1 region.
 provider "aws" {
