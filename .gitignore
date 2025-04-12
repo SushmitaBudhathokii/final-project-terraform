@@ -1,2 +1,7 @@
-.terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+*.pem
+webserver/acs730-final-project*
 .vscode
