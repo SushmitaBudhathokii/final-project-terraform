@@ -3,5 +3,6 @@
 .terraform/
 terraform.tfvars
 *.pem
-webserver/acs730-final-project*
+*.pub
+webserver/acs730-final-proj*
 .vscode
