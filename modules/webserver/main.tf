@@ -77,6 +77,7 @@ resource "aws_instance" "dbserver5" {
   subnet_id     = data.terraform_remote_state.network.outputs.private_subnet_ids[0]
   key_name      = aws_key_pair.key_pair.key_name
   security_groups = [aws_security_group.database_sg.id, aws_security_group.private_security_group.id]
+  user_data = base64encode(templatefile("${path.module}/userdata_db.tpl", {}))
   tags = {
     Name = "DB Server 5"
   }

@@ -8,7 +8,6 @@ resource "aws_launch_template" "web_server" {
     associate_public_ip_address = true
     security_groups             = [aws_security_group.webserver_sg.id]
   }
-
   user_data = base64encode(templatefile("${path.module}/userdata_webserver.tpl", {}))
 }
 
