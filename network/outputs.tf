@@ -1,22 +1,19 @@
-# networkmodule/outputs.tf
-# Define outputs for network module, such as VPC and subnet IDs.
-
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value = module.network.vpc_id
 }
 
 output "public_subnet_ids" {
-  value = aws_subnet.public_subnet[*].id
+  value = module.network.public_subnet_ids
 }
 
 output "private_subnet_ids" {
-  value = aws_subnet.private_subnet[*].id
+  value = module.network.private_subnet_ids
 }
 
 output "vpc_route_table_id" {
-  value = aws_vpc.main.main_route_table_id
+  value = module.network.vpc_route_table_id
 }
 
 output "public_subnet_route_table_id" {
-  value = aws_route_table.public_rt[*].id
+  value = module.network.public_subnet_route_table_id
 }
