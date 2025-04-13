@@ -39,7 +39,6 @@ data "terraform_remote_state" "network" {
 }
 
 # Bastion Instance Configuration
-
 data "aws_instances" "bastion_instance" {
   filter {
     name   = "subnet-id"
@@ -68,6 +67,12 @@ resource "aws_ec2_tag" "tag_bastion_instance" {
   resource_id = data.aws_instance.bastion_instance_detail.id
   key         = "Name"
   value       = "Bastion-WebServer"
+}
+
+resource "aws_eip" "bastion_eip" {
+  instance = data.aws_instance.bastion_instance_detail.id
+  vpc      = true
+  depends_on = [data.aws_instances.bastion_instance, aws_security_group.bastion_sg]
 }
 
 # Database Server
