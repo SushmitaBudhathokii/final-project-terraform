@@ -141,18 +141,70 @@ resource "aws_lb_listener" "alb_listener" {
 #   port             = 80
 # }
 
-# Bastion VM (WebServer2)
-resource "aws_instance" "bastion" {
-  ami           = data.aws_ami.amazon_linux_2023.id
-  instance_type = "t2.micro"
-  subnet_id     = data.terraform_remote_state.network.outputs.public_subnet_ids[1]
-  key_name      = aws_key_pair.key_pair.key_name
-  security_groups = [aws_security_group.webserver_sg.id, aws_security_group.bastion_sg.id]
-  associate_public_ip_address = true
-  tags = {
-    Name = "Bastion VM"
+
+
+##########################################################################################
+# # Bastion VM (WebServer2)
+# resource "aws_instance" "bastion" {
+#   ami           = data.aws_ami.amazon_linux_2023.id
+#   instance_type = "t2.micro"
+#   subnet_id     = data.terraform_remote_state.network.outputs.public_subnet_ids[1]
+#   key_name      = aws_key_pair.key_pair.key_name
+#   security_groups = [aws_security_group.webserver_sg.id, aws_security_group.bastion_sg.id]
+#   associate_public_ip_address = true
+#   tags = {
+#     Name = "Bastion VM"
+#   }
+# }
+#########################################################################################
+
+data "aws_instances" "bastion_instance" {
+  filter {
+    name   = "subnet-id"
+    values = [data.terraform_remote_state.network.outputs.public_subnet_ids[1]]
   }
+
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
+
+  depends_on = [aws_autoscaling_group.webserver_asg]
 }
+
+data "aws_instance" "bastion_instance_detail" {
+  instance_id = tolist(data.aws_instances.bastion_instance.ids)[0]
+}
+
+resource "aws_network_interface_sg_attachment" "bastion_sg_attachment" {
+  depends_on = [data.aws_instances.bastion_instance, aws_security_group.bastion_sg]
+  network_interface_id = data.aws_instance.bastion_instance_detail.network_interface_id
+  security_group_id    = aws_security_group.bastion_sg.id
+}
+
+resource "aws_ec2_tag" "tag_bastion_instance" {
+  resource_id = data.aws_instance.bastion_instance_detail.id
+  key         = "Name"
+  value       = "Bastion-WebServer"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Database Server
 resource "aws_instance" "dbserver5" {
