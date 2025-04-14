@@ -32,5 +32,27 @@ resource "aws_autoscaling_group" "webserver_asg" {
     value               = "WebServer"
     propagate_at_launch = true
   }
+  tag {
+    key                 = "Role"
+    value               = "WebServer"
+    propagate_at_launch = true
+  }
   
+}
+
+data "aws_instances" "webserversRole" {
+  filter {
+    name   = "tag:Role"
+    values = ["WebServer"]
+  }
+
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
+}
+
+data "aws_instance" "web_instance_details" {
+  for_each    = toset(data.aws_instances.webserversRole.ids)
+  instance_id = each.key
 }

@@ -44,12 +44,10 @@ data "aws_instances" "bastion_instance" {
     name   = "subnet-id"
     values = [data.terraform_remote_state.network.outputs.public_subnet_ids[1]]
   }
-
   filter {
     name   = "instance-state-name"
     values = ["running"]
   }
-
   depends_on = [aws_autoscaling_group.webserver_asg]
 }
 
