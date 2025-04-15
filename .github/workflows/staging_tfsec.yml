@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        folder: [network, webserver]
+        folder: [network, webserver, modules]
 
     steps:
       - name: Checkout
