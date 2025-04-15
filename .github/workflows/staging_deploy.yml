@@ -148,3 +148,7 @@ jobs:
       - name: Terraform Apply (Webserver)\
         run: terraform apply -auto-approve tfplan
         working-directory: webserver
+
+      - name: Terraform Destroy (Webserver)
+        run: terraform destroy -auto-approve
+        working-directory: webserver
