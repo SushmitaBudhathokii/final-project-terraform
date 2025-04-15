@@ -35,13 +35,17 @@ jobs:
       - name: Show version
         run: tflint --version
 
-      - name: Init TFLint
-        run: tflint --init
-        working-directory: ./staging
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint ./network
+          tflint ./webserver
+        working-directory: ./ 
 
-      - name: Run TFLint
-        run: tflint -f compact
-        working-directory: ./staging
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint -f compact ./network
+          tflint -f compact ./webserver
+        working-directory: ./ 
 
       - name: Run tfsec
         uses: aquasecurity/tfsec-sarif-action@9a83b5c3524f825c020e356335855741fd02745f
