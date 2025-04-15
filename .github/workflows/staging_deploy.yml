@@ -43,20 +43,36 @@ jobs:
           terraform_wrapper: true
 
       - name: Terraform fmt
-        id: fmt
+        id: fmt_modules
         run: terraform fmt 
         continue-on-error: true
         working-directory: ./modules  # Or `./webserver` based on your use case
 
       - name: Terraform Init
-        id: init
+        id: init_m
         run: terraform init
         working-directory: ./modules  # Or `./webserver` based on your use case
 
       - name: Terraform Validate
-        id: validate
+        id: validate_m
         run: terraform validate -no-color
         working-directory: ./modules  # Or `./webserver` based on your use case
+
+      - name: Terraform fmt
+        id: fmt_n
+        run: terraform fmt 
+        continue-on-error: true
+        working-directory: ./network  # Or `./webserver` based on your use case
+
+      - name: Terraform Init
+        id: init_n
+        run: terraform init
+        working-directory: ./network  # Or `./webserver` based on your use case
+
+      - name: Terraform Validate
+        id: validate_n
+        run: terraform validate -no-color
+        working-directory: ./network  # Or `./webserver` based on your use case
 
       - name: Terraform Plan
         id: plan
@@ -64,7 +80,7 @@ jobs:
           terraform init -input=false -no-color
           terraform plan -input=false -no-color -out=tf.plan
           terraform show -no-color tf.plan > tf.plan.txt  # Convert binary plan to readable format
-        working-directory: ./modules 
+        working-directory: ./network 
         continue-on-error: true
 
       - name: Get result
