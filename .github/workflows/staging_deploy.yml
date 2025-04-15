@@ -32,12 +32,12 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Terraform Init (Network)
+      - name: Terraform Init (Modules/Network)
         run: terraform init
         working-directory: modules/network
 
-
   terraform-network:
+    needs: terraform-modules-network
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -77,12 +77,8 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: network
 
-      - name: Network Approval
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: echo "Network infrastructure changes have been applied"
-
-
   terraform-modules-webserver:
+    needs: terraform-modules-network
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -105,12 +101,12 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Terraform Init (Network)
+      - name: Terraform Init (Modules/Webserver)
         run: terraform init
         working-directory: modules/webserver
 
-
   terraform-webserver:
+    needs: terraform-network
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -133,23 +129,23 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Terraform Init (Network)
+      - name: Write public key file
+        run: |
+          echo "${{ secrets.TF_PUBLIC_KEY_B64 }}" | base64 -d > webserver/acs730-final-proj.pub
+
+      - name: Terraform Init (Webserver)
         run: terraform init
         working-directory: webserver
 
-      - name: Terraform Validate (Network)
+      - name: Terraform Validate (Webserver)
         run: terraform validate
         working-directory: webserver
 
-      - name: Terraform Plan (Network)
+      - name: Terraform Plan (Webserver)
         run: terraform plan -out=tfplan
         working-directory: webserver
 
-      - name: Terraform Apply (Network)
+      - name: Terraform Apply (Webserver)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
         working-directory: webserver
-
-      - name: Network Approval
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: echo "Network infrastructure changes have been applied"
