@@ -60,8 +60,11 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
-        working-directory: ./modules  # Or `./webserver` based on your use case
+        run: |
+          terraform init -input=false -no-color
+          terraform plan -input=false -no-color -out=tf.plan
+          terraform show -no-color tf.plan > tf.plan.txt  # Convert binary plan to readable format
+        working-directory: ./modules 
         continue-on-error: true
 
       - name: Get result
