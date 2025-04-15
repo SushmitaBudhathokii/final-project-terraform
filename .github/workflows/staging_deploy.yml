@@ -54,7 +54,7 @@ jobs:
         run: echo "Network infrastructure changes have been applied"
 
 
-  terraform-modules-webserver:
+  terraform-network:
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -79,20 +79,20 @@ jobs:
 
       - name: Terraform Init (Network)
         run: terraform init
-        working-directory: modules/webserver
+        working-directory: network
 
       - name: Terraform Validate (Network)
         run: terraform validate
-        working-directory: modules/webserver
+        working-directory: network
 
       - name: Terraform Plan (Network)
         run: terraform plan -out=tfplan
-        working-directory: modules/webserver
+        working-directory: network
 
       - name: Terraform Apply (Network)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
-        working-directory: modules/webserver
+        working-directory: network
 
       - name: Network Approval
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
