@@ -46,17 +46,17 @@ jobs:
         id: fmt_modules
         run: terraform fmt 
         continue-on-error: true
-        working-directory: ./modules  # Or `./webserver` based on your use case
+        working-directory: ./modules/network  # Or `./webserver` based on your use case
 
       - name: Terraform Init
         id: init_m
         run: terraform init
-        working-directory: ./modules  # Or `./webserver` based on your use case
+        working-directory: ./modules/network  # Or `./webserver` based on your use case
 
       - name: Terraform Validate
         id: validate_m
         run: terraform validate -no-color
-        working-directory: ./modules  # Or `./webserver` based on your use case
+        working-directory: ./modules/network  # Or `./webserver` based on your use case
 
       - name: Terraform fmt
         id: fmt_n
