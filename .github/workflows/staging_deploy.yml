@@ -5,13 +5,15 @@ on:
     branches:
     - staging
     paths:
+    - modules/**
     - network/**
     - webserver/**
-
+    
   pull_request:
     branches:
     - staging
     paths:
+    - modules/**
     - network/**
     - webserver/**
 
@@ -44,22 +46,22 @@ jobs:
         id: fmt
         run: terraform fmt 
         continue-on-error: true
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
 
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
 
       - name: Terraform Plan
         id: plan
         run: terraform plan -input=false -no-color -out tf.plan
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
         continue-on-error: true
 
       - name: Get result
@@ -68,7 +70,7 @@ jobs:
       - name: Terraform Show
         id: show
         run: terraform show -no-color tf.plan 2>&1 > /tmp/plan.txt
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
@@ -113,5 +115,5 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
         run: terraform apply -input=false tf.plan
-        working-directory: ./network  # Or `./webserver` based on your use case
+        working-directory: ./modules  # Or `./webserver` based on your use case
         shell: bash
