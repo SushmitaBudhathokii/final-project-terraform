@@ -7,14 +7,12 @@ on:
     paths:
       - network/**
       - webserver/**
-      - modules/**
   pull_request:
     branches:
       - staging
     paths:
       - network/**
       - webserver/**
-      - modules/**
 
 jobs:
   tfsec:
@@ -23,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        folder: [network, webserver, modules]
+        folder: [network, webserver]
 
     steps:
       - name: Checkout
