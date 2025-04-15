@@ -78,7 +78,7 @@ jobs:
         working-directory: network
 
   terraform-modules-webserver:
-    needs: terraform-modules-network
+    needs: terraform-network
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -106,7 +106,7 @@ jobs:
         working-directory: modules/webserver
 
   terraform-webserver:
-    needs: terraform-network
+    needs: terraform-modules-webserver
     runs-on: ubuntu-latest
     environment: staging
     steps:
