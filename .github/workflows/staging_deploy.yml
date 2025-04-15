@@ -69,6 +69,9 @@ jobs:
         run: terraform init
         working-directory: ./modules/webserver  # Or `./webserver` based on your use case
 
+      - name: Wait for 30 seconds
+        run: sleep 30  # This introduces a 30-second delay before the next step
+
       - name: Terraform fmt
         id: fmt_n1
         run: terraform fmt 
