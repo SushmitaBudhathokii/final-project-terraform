@@ -15,20 +15,41 @@ on:
       - webserver/**
 
 jobs:
-  tfsec:
-    name: Run tfsec on all Terraform folders
+  tfsec_tflint_staging:
+    name: Run tfsec sarif report
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        folder: [network, webserver]
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
-      - name: Checkout
+      - name: Clone repo
         uses: actions/checkout@v3
+      
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+           tflint_version: v0.38.1
+           
+      - name: Show version
+        run: tflint --version
 
-      - name: Install tfsec
-        run: curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+      - name: Init TFLint
+        run: tflint --init
+        working-directory: ./staging
+
+      - name: Run TFLint
+        run: tflint -f compact
+        working-directory: ./staging
 
       - name: Run tfsec
-        run: tfsec ./${{ matrix.folder }}
+        uses: aquasecurity/tfsec-sarif-action@9a83b5c3524f825c020e356335855741fd02745f
+        with:
+          sarif_file: tfsec.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: tfsec.sarif
