@@ -69,8 +69,19 @@ jobs:
         run: terraform init
         working-directory: ./modules/webserver  # Or `./webserver` based on your use case
 
+      - name: Terraform fmt
+        id: fmt_n1
+        run: terraform fmt 
+        continue-on-error: true
+        working-directory: ./network  # Or `./webserver` based on your use case
+
+      - name: Terraform Init
+        id: init_n1
+        run: terraform init
+        working-directory: ./network  # Or `./webserver` based on your use case
+
       - name: Terraform Validate
-        id: validate_n
+        id: validate_n1
         run: terraform validate -no-color
         working-directory: ./network  # Or `./webserver` based on your use case
 
