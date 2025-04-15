@@ -73,7 +73,6 @@ jobs:
         working-directory: network
 
       - name: Terraform Apply (Network)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
         working-directory: network
 
@@ -145,7 +144,6 @@ jobs:
         run: terraform plan -out=tfplan
         working-directory: webserver
 
-      - name: Terraform Apply (Webserver)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: Terraform Apply (Webserver)\
         run: terraform apply -auto-approve tfplan
         working-directory: webserver
