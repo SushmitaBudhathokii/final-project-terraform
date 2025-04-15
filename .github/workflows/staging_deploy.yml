@@ -3,27 +3,27 @@ name: "Terraform - Staging"
 on:
   push:
     branches:
-    - staging
+      - staging
     paths:
-    - modules/**
-    - network/**
-    - webserver/**
+      - modules/**
+      - network/**
+      - webserver/**
     
   pull_request:
     branches:
-    - staging
+      - staging
     paths:
-    - modules/**
-    - network/**
-    - webserver/**
+      - modules/**
+      - network/**
+      - webserver/**
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  terraform:
-    name: "Terraform"
+  terraform_modules:
+    name: "Terraform Modules"
     runs-on: ubuntu-latest
     environment: staging
     env:
@@ -42,106 +42,117 @@ jobs:
           terraform_version: 1.1.9
           terraform_wrapper: true
 
-      - name: Terraform fmt
-        id: fmt_modules
-        run: terraform fmt 
+      - name: Terraform fmt (modules)
+        run: terraform fmt
         continue-on-error: true
-        working-directory: ./modules/network  # Or `./webserver` based on your use case
+        working-directory: ./modules/network
 
-      - name: Terraform Init
-        id: init_m
+      - name: Terraform Init (modules)
         run: terraform init
-        working-directory: ./modules/network  # Or `./webserver` based on your use case
+        working-directory: ./modules/network
 
-      - name: Terraform Validate
-        id: validate_m
+      - name: Terraform Validate (modules)
         run: terraform validate -no-color
-        working-directory: ./modules/network  # Or `./webserver` based on your use case
+        working-directory: ./modules/network
 
-      - name: Terraform fmt
-        id: fmt_n
-        run: terraform fmt 
-        continue-on-error: true
-        working-directory: ./modules/webserver  # Or `./webserver` based on your use case
-
-      - name: Terraform Init
-        id: init_n
-        run: terraform init
-        working-directory: ./modules/webserver  # Or `./webserver` based on your use case
-
-      - name: Wait for 30 seconds
-        run: sleep 30  # This introduces a 30-second delay before the next step
-
-      - name: Terraform fmt
-        id: fmt_n1
-        run: terraform fmt 
-        continue-on-error: true
-        working-directory: ./network  # Or `./webserver` based on your use case
-
-      - name: Terraform Init
-        id: init_n1
-        run: terraform init
-        working-directory: ./network  # Or `./webserver` based on your use case
-
-      - name: Terraform Validate
-        id: validate_n1
-        run: terraform validate -no-color
-        working-directory: ./network  # Or `./webserver` based on your use case
-
-      - name: Terraform Plan
-        id: plan
+      - name: Terraform Plan (modules)
         run: |
           terraform init -input=false -no-color
           terraform plan -input=false -no-color -out=tf.plan
           terraform show -no-color tf.plan > tf.plan.txt  # Convert binary plan to readable format
-        working-directory: ./network 
-        continue-on-error: true
+        working-directory: ./modules/network
 
-      - name: Get result
-        run: echo "${{ steps.validate.outputs.stdout }}"
-
-      - uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require("fs");
-            const plan = fs.readFileSync("/tmp/plan.txt", "utf8");
-            const maxGitHubBodyCharacters = 65536;
-
-            function chunkSubstr(str, size) {
-              const numChunks = Math.ceil(str.length / size)
-              const chunks = new Array(numChunks)
-              for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-                chunks[i] = str.substr(o, size)
-              }
-              return chunks
-            }
-
-            // Split the Terraform plan into chunks if it's too big and can't fit into the GitHub Action
-            var plans = chunkSubstr(plan, maxGitHubBodyCharacters); 
-            for (let i = 0; i < plans.length; i++) {
-              const output = `### ${{ inputs.plan-title }} Part # ${i + 1}
-              #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-              #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-              #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-              <details><summary>Show Plan</summary>
-              \`\`\`\n
-              ${plans[i]}
-              \`\`\`
-              </details>
-              *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;   
-
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: output
-              })
-            }
-
-      - name: Terraform Apply
+      - name: Terraform Apply (modules)
         if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
         run: terraform apply -input=false tf.plan
-        working-directory: ./modules  # Or `./webserver` based on your use case
-        shell: bash
+        working-directory: ./modules/network
+        
+  terraform_webserver:
+    name: "Terraform Webserver"
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN:  ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.9
+          terraform_wrapper: true
+
+      - name: Terraform fmt (webserver)
+        run: terraform fmt
+        continue-on-error: true
+        working-directory: ./modules/webserver
+
+      - name: Terraform Init (webserver)
+        run: terraform init
+        working-directory: ./modules/webserver
+
+      - name: Terraform Validate (webserver)
+        run: terraform validate -no-color
+        working-directory: ./modules/webserver
+
+      - name: Terraform Plan (webserver)
+        run: |
+          terraform init -input=false -no-color
+          terraform plan -input=false -no-color -out=tf.plan
+          terraform show -no-color tf.plan > tf.plan.txt  # Convert binary plan to readable format
+        working-directory: ./modules/webserver
+
+      - name: Terraform Apply (webserver)
+        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+        run: terraform apply -input=false tf.plan
+        working-directory: ./modules/webserver
+  
+  terraform_network:
+    name: "Terraform Network"
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN:  ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.1.9
+          terraform_wrapper: true
+
+      - name: Terraform fmt (network)
+        run: terraform fmt
+        continue-on-error: true
+        working-directory: ./network
+
+      - name: Terraform Init (network)
+        run: terraform init
+        working-directory: ./network
+
+      - name: Terraform Validate (network)
+        run: terraform validate -no-color
+        working-directory: ./network
+
+      - name: Terraform Plan (network)
+        run: |
+          terraform init -input=false -no-color
+          terraform plan -input=false -no-color -out=tf.plan
+          terraform show -no-color tf.plan > tf.plan.txt  # Convert binary plan to readable format
+        working-directory: ./network
+
+      - name: Terraform Apply (network)
+        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+        run: terraform apply -input=false tf.plan
+        working-directory: ./network
