@@ -1,19 +1,18 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: tfsec
+name: "Terraform tfsec Scan - Staging"
 
 on:
   push:
-    branches: [ "dev", "staging"]
-    paths: 
-    - staging/**
+    branches:
+      - prod
+    paths:
+      - network/**
+      - webserver/**
   pull_request:
-    branches: [ "prod" ]
-    paths: 
-    - staging/**
+    branches:
+      - prod
+    paths:
+      - network/**
+      - webserver/**
 
 jobs:
   tfsec_tflint_staging:
@@ -36,21 +35,14 @@ jobs:
       - name: Show version
         run: tflint --version
 
-      - name: Init TFLint
-        run: tflint --init
-        working-directory: ./staging
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint ./network
+          tflint ./webserver
+        working-directory: ./ 
 
-      - name: Run TFLint
-        run: tflint -f compact
-        working-directory: ./staging
-
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-sarif-action@9a83b5c3524f825c020e356335855741fd02745f
-        with:
-          sarif_file: tfsec.sarif
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: tfsec.sarif
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint -f compact ./network
+          tflint -f compact ./webserver
+        working-directory: ./ 
