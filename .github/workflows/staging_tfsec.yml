@@ -3,13 +3,13 @@ name: "Terraform tfsec Scan - Staging"
 on:
   push:
     branches:
-      - staging
+      - prod
     paths:
       - network/**
       - webserver/**
   pull_request:
     branches:
-      - staging
+      - prod
     paths:
       - network/**
       - webserver/**
