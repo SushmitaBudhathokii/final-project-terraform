@@ -133,9 +133,9 @@ jobs:
           mkdir -p webserver
           ssh-keygen -t rsa -b 2048 -f webserver/acs730-final-proj -q -N ""
 
-      # - name: Terraform Init (Webserver)
-      #   run: terraform init
-      #   working-directory: webserver
+      - name: Terraform Init (Webserver)
+        run: terraform init
+        working-directory: webserver
 
       # - name: Terraform Validate (Webserver)
       #   run: terraform validate
