@@ -1,0 +1,13 @@
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+webserver/.terraform.lock.hcl
+network/.terraform.lock.hcl
+*.pem
+*.pub
+webserver/acs730-final-proj
+webserver/acs730-final-proj.pub
+webserver/acs730-final-proj.pem
+webserver/acs730-final-proj.key
+.vscode

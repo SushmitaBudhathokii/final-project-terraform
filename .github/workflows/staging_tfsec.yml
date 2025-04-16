@@ -1,0 +1,48 @@
+name: "Terraform tfsec Scan - Staging"
+
+on:
+  push:
+    branches:
+      - prod
+    paths:
+      - network/**
+      - webserver/**
+  pull_request:
+    branches:
+      - prod
+    paths:
+      - network/**
+      - webserver/**
+
+jobs:
+  tfsec_tflint_staging:
+    name: Run tfsec sarif report
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+      
+      - uses: terraform-linters/setup-tflint@v2
+        name: Setup TFLint
+        with:
+           tflint_version: v0.38.1
+           
+      - name: Show version
+        run: tflint --version
+
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint ./network
+          tflint ./webserver
+        working-directory: ./ 
+
+      - name: Run TFLint on multiple directories
+        run: |
+          tflint -f compact ./network
+          tflint -f compact ./webserver
+        working-directory: ./ 
