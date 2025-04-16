@@ -32,7 +32,7 @@ data "aws_ami" "amazon_linux_2023" {
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
-    bucket = "final-project-s3"
+    bucket = "final-project-acs-s3"
     key    = "network/terraform.tfstate"
     region = "us-east-1"
   }
