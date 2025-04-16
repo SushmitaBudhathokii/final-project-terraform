@@ -9,72 +9,72 @@ on:
       - staging
 
 jobs:
-  # terraform-modules-network:
-  #   runs-on: ubuntu-latest
-  #   environment: staging
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  terraform-modules-network:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  #     - name: Set up AWS CLI
-  #       uses: aws-actions/configure-aws-credentials@v2
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - name: Verify AWS credentials
-  #       run: aws sts get-caller-identity
+      - name: Verify AWS credentials
+        run: aws sts get-caller-identity
 
-  #     - name: Install Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: 1.5.0
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
 
-  #     - name: Terraform Init (Modules/Network)
-  #       run: terraform init
-  #       working-directory: modules/network
+      - name: Terraform Init (Modules/Network)
+        run: terraform init
+        working-directory: modules/network
 
-  # terraform-network:
-  #   needs: terraform-modules-network
-  #   runs-on: ubuntu-latest
-  #   environment: staging
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  terraform-network:
+    needs: terraform-modules-network
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  #     - name: Set up AWS CLI
-  #       uses: aws-actions/configure-aws-credentials@v2
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - name: Verify AWS credentials
-  #       run: aws sts get-caller-identity
+      - name: Verify AWS credentials
+        run: aws sts get-caller-identity
 
-  #     - name: Install Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: 1.5.0
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
 
-  #     - name: Terraform Init (Network)
-  #       run: terraform init
-  #       working-directory: network
+      - name: Terraform Init (Network)
+        run: terraform init
+        working-directory: network
 
-  #     - name: Terraform Validate (Network)
-  #       run: terraform validate
-  #       working-directory: network
+      - name: Terraform Validate (Network)
+        run: terraform validate
+        working-directory: network
 
-  #     - name: Terraform Plan (Network)
-  #       run: terraform plan -out=tfplan
-  #       working-directory: network
+      - name: Terraform Plan (Network)
+        run: terraform plan -out=tfplan
+        working-directory: network
 
-  #     - name: Terraform Apply (Network)
-  #       run: terraform apply -auto-approve tfplan
-  #       working-directory: network
+      - name: Terraform Apply (Network)
+        run: terraform apply -auto-approve tfplan
+        working-directory: network
 
   # terraform-modules-webserver:
   #   needs: terraform-network
@@ -149,6 +149,6 @@ jobs:
       #   run: terraform apply -auto-approve tfplan
       #   working-directory: webserver
 
-      - name: Terraform Destroy (Webserver)
-        run: terraform destroy -auto-approve
-        working-directory: webserver
+      # - name: Terraform Destroy (Webserver)
+      #   run: terraform destroy -auto-approve
+      #   working-directory: webserver
