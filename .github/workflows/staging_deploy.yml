@@ -105,7 +105,7 @@ jobs:
         working-directory: modules/webserver
 
   terraform-webserver:
-    # needs: terraform-modules-webserver
+    needs: terraform-modules-webserver
     runs-on: ubuntu-latest
     environment: staging
     steps:
